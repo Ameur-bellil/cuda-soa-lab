@@ -11,12 +11,20 @@ pipeline {
 
         stage('GPU Sanity Test') {
             steps {
-                echo 'Installing required dependencies for cuda_test'
+                echo 'Creating virtual environment and installing dependencies'
                 sh '''
-                    pip3 install --user numba-cuda[cu12] numpy
+                    # Create virtual environment if it doesn't exist
+                    python3 -m venv venv
+
+                    # Activate and install dependencies
+                    . venv/bin/activate
+                    pip install --upgrade pip
+                    pip install numba-cuda[cu12] numpy
                 '''
                 echo 'Running CUDA sanity check...'
                 sh '''
+                    # Run test within virtual environment
+                    . venv/bin/activate
                     python3 cuda_test.py
                 '''
             }
